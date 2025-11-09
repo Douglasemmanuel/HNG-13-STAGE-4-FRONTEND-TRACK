@@ -14,9 +14,9 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        tabBarShowLabel: false, // 👈 hide text labels
+        tabBarShowLabel: false, 
         tabBarButton: HapticTab,
-        headerShown: false, // 👈 hide header bar
+        headerShown: false, 
       }}
     >
       {/* 🏠 Home */}
