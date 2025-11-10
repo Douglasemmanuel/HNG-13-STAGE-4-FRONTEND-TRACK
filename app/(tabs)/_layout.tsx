@@ -4,7 +4,7 @@ import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Image } from 'react-native';
+import { Image  , View} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
@@ -19,7 +19,7 @@ export default function TabLayout() {
         headerShown: false, 
       }}
     >
-      {/* 🏠 Home */}
+   
       <Tabs.Screen
         name="index"
         options={{
@@ -40,11 +40,25 @@ export default function TabLayout() {
 <Tabs.Screen
   name="create"
   options={{
-    tabBarIcon: ({ color, size }) => (
-      <Ionicons name="add-circle" size={size ?? 28} color={color} />
+    tabBarButton: (props) => (
+      <View
+        style={{
+          position: 'absolute',
+          top: -25, // lift above tab bar
+          justifyContent: 'center',
+          alignItems: 'center',
+          // ...props.style,
+        }}
+      >
+        <HapticTab {...props}>
+          <Ionicons name="add-circle" size={60} color={Colors.light.tint} />
+        </HapticTab>
+      </View>
     ),
   }}
 />
+
+
    
       {/* <Tabs.Screen
         name="explore"

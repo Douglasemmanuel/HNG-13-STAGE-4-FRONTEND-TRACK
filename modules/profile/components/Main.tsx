@@ -10,14 +10,14 @@ const Main:React.FC = () => {
    const colorScheme = useColorScheme() || 'light'; 
     const theme = Colors[colorScheme];
   return (
-    <View style={{alignItems:"center" , justifyContent:"center" , marginTop:40 }}>
+    <View style={{alignItems:"center" , justifyContent:"center" , marginTop:20 }}>
         <ProfileImage
         source={require('../../../assets/images/Douglas.jpeg')}
-        size={120} // you can change the size
+        size={120} 
         borderColor={theme.tint}
         borderWidth={3}
       />
-     <ThemedText type='defaultSemiBold'>Emmanuel Douglas</ThemedText>
+     <ThemedText type='subtitle' style={{marginTop:5}}>Emmanuel Douglas</ThemedText>
     </View>
   )
 }
