@@ -6,9 +6,10 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Image  , View} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+import { useUserStore } from '@/modules/auth/store/AuthStore';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const {currentUser} = useUserStore();
 
   return (
     <Tabs
@@ -44,10 +45,9 @@ export default function TabLayout() {
       <View
         style={{
           position: 'absolute',
-          top: -25, // lift above tab bar
+          top: -25, 
           justifyContent: 'center',
           alignItems: 'center',
-          // ...props.style,
         }}
       >
         <HapticTab {...props}>
@@ -58,22 +58,12 @@ export default function TabLayout() {
   }}
 />
 
-
-   
-      {/* <Tabs.Screen
-        name="explore"
-        options={{
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="person.crop.circle" color={color} />
-          ),
-        }}
-      /> */}
     <Tabs.Screen
         name="explore"
         options={{
           tabBarIcon: ({ focused }) => (
             <Image
-              source={require('../../assets/images/Douglas.jpeg')} // ✅ correct path
+              source={{uri:currentUser.avatar}} 
               style={{
                 width: 30,
                 height: 30,

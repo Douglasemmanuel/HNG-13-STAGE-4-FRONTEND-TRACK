@@ -7,7 +7,14 @@ import CustomButton from '@/reuseable/Button'
 import Loader from '@/reuseable/Loader'
 import GlobalToast from '@/reuseable/GlobalToast'
 import { showToast } from  '../../../utils/toast'
+import { TokenStorage } from '@/utils/token_utils'
 import { loginSchema , LoginFormData } from '../validation/login_validationSchemas'
+import { useSignIn , useUser  } from '@clerk/clerk-expo'
+import { useUserStore } from '../store/AuthStore'
+
+
+
+
 type LoginFormProps = {
   email: string
   setEmail: (text: string) => void
@@ -26,29 +33,33 @@ const LoginForm:React.FC<LoginFormProps> = ({
   toggleSecure,
   onSubmit,
 }) => {
+   const { isLoaded,signIn, setActive } = useSignIn()
+  const {user} = useUser()
     const router = useRouter();
+    const {  isAuthenticated ,setCurrentUser , currentUser} = useUserStore();
     const [isLoading , setIsLoading] = useState<boolean>(false)
      const [errors, setErrors] = useState<Partial<Record<keyof LoginFormData, string>>>({});
+
+
 const handleAuth = async () => {
-  if (isLoading) return;
+  if (!isLoaded) return; // wait until Clerk is ready
   setIsLoading(true);
 
+  // Basic input validation
   if (!email.trim() || !password.trim()) {
-    setIsLoading(false);
     showToast.error("Please enter both email and password", {
       position: "top",
       duration: 1000,
     });
+    setIsLoading(false);
     return;
   }
 
-  // 1. Signup validation & flow
+  // Zod schema validation
   const formData: LoginFormData = { email, password };
-
   const validation = loginSchema.safeParse(formData);
-  if (!validation.success) {
-    setIsLoading(false);
 
+  if (!validation.success) {
     const fieldErrors: Partial<Record<keyof LoginFormData, string>> = {};
     validation.error.issues.forEach((err) => {
       if (err.path.length > 0) {
@@ -56,37 +67,70 @@ const handleAuth = async () => {
         fieldErrors[key] = err.message;
       }
     });
-
     setErrors(fieldErrors);
-    showToast.error("Email and Password don't match", {
+    showToast.error("Invalid email or password format", {
       position: "top",
       duration: 2000,
     });
+    setIsLoading(false);
     return;
   }
 
   setErrors({});
 
-  // Simulate signup/login process
-  await new Promise((res) => setTimeout(res, 2000));
+  try {
+    // ✅ Clerk sign-in
+    const signInAttempt = await signIn.create({
+      identifier: email, 
+      password,
+    });
 
-  setEmail('');
-  setPassword('');
+    if (signInAttempt.status === "complete") {
+      await setActive({ session: signInAttempt.createdSessionId });
+       
+      console.log("✅ Signed in:", signInAttempt);
+       console.log("✅ Signed in Details:", signInAttempt.id);
+         const clerkUser = user;
 
-  const toastDuration = 1000;
-  if (onSubmit) onSubmit();
-
-  showToast.success("Login successfully!", {
-    position: "top",
-    duration: toastDuration,
+        console.log("✅ Clerk user object:", clerkUser);
+        useUserStore.getState().setCurrentUser({
+    firstName: clerkUser?.firstName || undefined,
+    lastName: clerkUser?.lastName || undefined,
+    email: clerkUser?.emailAddresses?.[0]?.emailAddress || undefined,
+    avatar: clerkUser?.imageUrl || undefined,
   });
+  
+  console.log("✅ user is in:",currentUser);
+      showToast.success("Login successful!", {
+        position: "top",
+        duration: 1000,
+      });
 
-  await new Promise((res) => setTimeout(res, toastDuration));
+      // Clear form fields
+      setEmail("");
+      setPassword("");
 
-  // Direct routing after login (without biometric)
-  setIsLoading(false);
-  router.push('/(tabs)');
+      // Navigate to main app
+      router.replace("/(tabs)");
+    } else {
+     
+      console.error("⚠️ Incomplete sign-in:", signInAttempt);
+      showToast.error("Sign-in incomplete. Please check your credentials.", {
+        position: "top",
+        duration: 2000,
+      });
+    }
+  } catch (err: any) {
+    console.error("❌ Clerk sign-in error:", err);
+    showToast.error(err.errors?.[0]?.longMessage || "Login failed.", {
+      position: "top",
+      duration: 2000,
+    });
+  } finally {
+    setIsLoading(false);
+  }
 };
+
 
   return (
      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

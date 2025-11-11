@@ -9,22 +9,34 @@ import { Colors } from '@/constants/theme';
 import { Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import Loader from '@/reuseable/Loader';
+import { TokenStorage } from '@/utils/token_utils';
 import { useState } from 'react';
+import { useAuth , useUser } from '@clerk/clerk-expo';
+import { useUserStore } from '@/modules/auth/store/AuthStore';
 const Header:React.FC = () => {
-  const route = useRouter();
+  const router = useRouter();
     const colorScheme = useColorScheme() || 'light'; 
   const theme = Colors[colorScheme];
+    const { clearCurrentUser , currentUser} = useUserStore();
+    const {signOut} = useAuth();
+    const {user} = useUser()
   const [isLoading , setLoading] = useState<boolean>(false)
-  const logout =()=>{
-    setLoading(true);
-     setTimeout(() => setLoading(false), 1000);
-    route.push('/(auth)/login')
-  }
+const logout = async () => {
+  setLoading(true);
+  await signOut();
+  await TokenStorage.clearToken();
+  clearCurrentUser();
+  setTimeout(() => {
+    setLoading(false);
+    router.replace("/(auth)/login");
+  }, 2000);
+};
+
   return (
     <>
    <View style={{flexDirection:"row" , justifyContent:"space-between" , alignItems:'center' }}>
      <ThemedText type='defaultSemiBold'>
-            emmanueldouglas2121@gmail.com
+            {currentUser.email}
         </ThemedText>
           <Pressable  onPress={logout}>
             <Ionicons name="log-out-outline" size={ 32} color={theme.icon}  />

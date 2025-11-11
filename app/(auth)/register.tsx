@@ -74,7 +74,7 @@ const Register:React.FC = () => {
            onPress={() => router.push('/(auth)/login')}
            type='default'
           style={{marginTop:10 ,  textAlign:'center'}}>
-            I have an account? <Text style={{color:"green"  ,paddingLeft:5}}>Sign In</Text></ThemedText>
+            I have an account? <Text style={{color:"green"  ,paddingLeft:5}}>Login</Text></ThemedText>
            <View style={{marginTop:10}}></View>
     </View>
         <View style={{marginTop:10}}></View>

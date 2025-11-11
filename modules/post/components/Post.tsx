@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 10,
     paddingVertical: 10,
-    borderBottomWidth: 0.4, 
+    // borderBottomWidth: 0.4, 
   },
   container:{
    borderBottomColor: '#ccc', 
