@@ -1,50 +1,124 @@
-# Welcome to your Expo app 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# 📝 Blog Post App
 
-## Get started
+A **modern mobile blogging app** built with **React Native**, **Convex**, and **Expo**.
+Users can create, view, and interact with blog posts in a sleek and intuitive UI.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## 🚀 Features
 
-2. Start the app
+* ✍️ **Create & Edit Posts** – Write blog posts with text and optional images
+* 🖼️ **Image Uploads** – Add media to your posts seamlessly
+* ❤️ **Like & Comment System** – Engage with content
+* 🔍 **Search Functionality** – Find users or posts instantly
+* 👤 **User Profiles** – View and manage your profile details
+* 🕒 **Live Updates** – Real-time sync powered by Convex
+* 🌗 **Dark & Light Mode** – Automatic theme switching
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 🧱 Tech Stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+| Category             | Technologies Used                         |
+| -------------------- | ----------------------------------------- |
+| **Frontend**         | React Native (Expo)                       |
+| **Backend**          | Convex (serverless database + API)        |
+| **Auth**             | Clerk / Auth0 *(depending on your setup)* |
+| **State Management** | React Hooks                               |
+| **UI**               | React Native  Custom Components    |
+| **Language**         | TypeScript                                |
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## ⚙️ Installation
 
-When you're ready, run:
+### 1. Clone the repository
 
 ```bash
-npm run reset-project
+git clone https://github.com/Douglasemmanuel/HNG-13-STAGE-4-FRONTEND-TRACK.git
+cd framez
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Install dependencies
 
-## Learn more
+```bash
+npm install
+# or
+yarn install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### 3. Set up environment variables
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Create a `.env` file in the root directory:
 
-## Join the community
+```bash
+CONVEX_DEPLOYMENT=<your-convex-deployment-url>
+CLERK_PUBLISHABLE_KEY=<your-clerk-key>
+```
 
-Join our community of developers creating universal apps.
+### 4. Run the development server
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npx expo start
+```
+
+Scan the QR code in your Expo Go app to preview it on your device 📱
+
+---
+
+
+
+
+## 🧠 Folder Structure
+
+```
+📂 blog-post-app
+ ┣ 📂 app
+ ┃ ┣ 📂 (tabs)
+ ┃ ┃ ┣ create.tsx
+ ┃ ┃ ┣ home.tsx
+ ┃ ┃ ┗ profile.tsx
+ | | |_ search.tsx
+ ┣ 📂 components
+ ┣ 📂 modules
+ ┣ 📂 constants
+ ┣ 📂 convex
+ ┣ 📄 app.json
+ ┣ 📄 package.json
+ ┗ 📄 README.md
+```
+
+---
+
+## 🌍 API Overview (Convex)
+
+Example mutation to add a thread:
+
+```ts
+export const addThread = mutation({
+  args: {
+    content: v.optional(v.string()),
+    mediaFiles: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    return await ctx.db.insert('messages', {
+      ...args,
+      userId: user._id,
+      likeCount: 0,
+      commentCount: 0,
+    });
+  },
+});
+```
+
+---
+
+
+
+## 🪪 License
+
+This project is licensed under the **MIT License** – feel free to use and modify it.
+
+---

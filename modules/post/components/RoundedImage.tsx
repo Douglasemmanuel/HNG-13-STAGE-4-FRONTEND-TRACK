@@ -5,7 +5,7 @@ interface Props {
   source: any; // require or uri
 }
 
-const RoundedImage: React.FC<Props> = ({ source }) => {
+const RoundedImage = ({ source }: { source: { uri: string } }) => {
   return (
     <View style={styles.container}>
       <Image

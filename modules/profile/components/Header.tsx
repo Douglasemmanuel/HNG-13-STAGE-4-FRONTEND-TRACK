@@ -36,7 +36,7 @@ const logout = async () => {
     <>
    <View style={{flexDirection:"row" , justifyContent:"space-between" , alignItems:'center' }}>
      <ThemedText type='defaultSemiBold'>
-            {currentUser.email}
+            {currentUser.email} 
         </ThemedText>
           <Pressable  onPress={logout}>
             <Ionicons name="log-out-outline" size={ 32} color={theme.icon}  />

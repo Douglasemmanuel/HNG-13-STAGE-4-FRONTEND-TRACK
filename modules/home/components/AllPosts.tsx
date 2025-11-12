@@ -1,57 +1,60 @@
-import { StyleSheet, Text, View , FlatList } from 'react-native'
+import { StyleSheet, Text, View , FlatList, RefreshControl } from 'react-native'
 import React from 'react'
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
 import Post from '@/modules/post/components/Post'
-const postsData = [
-  {
-    id: '1',
-    username: 'Douglas Emmanuel',
-    date: '27/4/2025',
-    text: 'One day I will post my big wins',
-    profileImage: require('../../../assets/images/Douglas.jpeg'),
-    postImage: require('../../../assets/images/Douglas.jpeg'),
-    initialLikes: 120,
-    initialComments: 15,
-  },
-  {
-    id: '2',
-    username: 'Douglas Emmanuel',
-    date: '27/4/2025',
-    text: 'One day I will post my big wins',
-    profileImage: require('../../../assets/images/Douglas.jpeg'),
-    postImage: require('../../../assets/images/Douglas.jpeg'),
-    initialLikes: 120,
-    initialComments: 15,
-  },
-  {
-    id: '3',
-    username: 'Jane Doe',
-    date: '26/4/2025',
-    text: 'Loving this new app!',
-    profileImage: require('../../../assets/images/Douglas.jpeg'),
-    initialLikes: 89,
-    initialComments: 7,
-  },
-];
+import { api } from '@/convex/_generated/api'
+import { usePaginatedQuery } from 'convex/react'
+import { useState } from 'react'
+import { useColorScheme } from 'react-native';
+import { Colors } from '@/constants/theme';
+
+import moment from 'moment'
 
 const AllPost:React.FC = () => {
+     const colorScheme = useColorScheme() || 'light'; 
+      const theme = Colors[colorScheme];
+  const {results , status , loadMore} = usePaginatedQuery(
+  api.messages.getThreads,
+  {},
+  {
+    initialNumItems:5,
+  }
+);
+const [refreshing , setRefreshing] = useState(false);
+const onLoadMore =()=>{
+  loadMore(5);
+};
+const onRefresh = ()=>{
+  setRefreshing(true);
+ setTimeout(()=>{
+  setRefreshing(false);
+ },2000)
+
+}
+
   return (
   <View >
-     <View style={{marginTop:5, marginBottom:5}}>
+     <View >
        <FlatList
-        data={postsData}
+        data={results}
         scrollEnabled={false}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
+        onEndReached={onLoadMore}
+        onEndReachedThreshold={0.5}
+
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
+        ItemSeparatorComponent={()=><View style={{height:StyleSheet.hairlineWidth , backgroundColor:theme.background}}/>}
         renderItem={({ item }) => (
           <Post
-            username={item.username}
-            date={item.date}
-            text={item.text}
-            profileImage={item.profileImage}
-            postImage={item.postImage}
-            initialLikes={item.initialLikes}
-            initialComments={item.initialComments}
+            username={item.creator?.username ?? '' }
+            date={moment(item._creationTime).format('DD/MM/YYYY')}
+            text={item.content}
+            profileImage={item.creator?.imageUrl}
+            postImage={item.mediaFiles ?? []}
+            initialLikes={item.likeCount}
+            initialComments={item.commentCount}
+          
           />
         )}
       />

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 interface User {
+  id?: string;         // ✅ Simple string id (e.g. Clerk user ID)
   avatar?: string;
   email?: string;
   firstName?: string;
@@ -17,6 +18,7 @@ interface UserStore {
 
 export const useUserStore = create<UserStore>((set) => ({
   currentUser: {
+    id: undefined,
     avatar: undefined,
     email: undefined,
     firstName: undefined,
@@ -25,17 +27,18 @@ export const useUserStore = create<UserStore>((set) => ({
 
   isAuthenticated: false,
 
-  // Update user data (partial allows updating only some fields)
+  // ✅ Set or update the current user
   setCurrentUser: (userData) =>
     set((state) => ({
       currentUser: { ...state.currentUser, ...userData },
-      isAuthenticated: true, // user is now logged in
+      isAuthenticated: true,
     })),
 
-  // Clear all user data and set isAuthenticated to false
+  // ✅ Clear user when logging out
   clearCurrentUser: () =>
     set(() => ({
       currentUser: {
+        id: undefined,
         avatar: undefined,
         email: undefined,
         firstName: undefined,
@@ -44,6 +47,6 @@ export const useUserStore = create<UserStore>((set) => ({
       isAuthenticated: false,
     })),
 
-  // Optional: manually set authentication state
+  // ✅ Manually control auth state
   setAuthenticated: (value: boolean) => set(() => ({ isAuthenticated: value })),
 }));

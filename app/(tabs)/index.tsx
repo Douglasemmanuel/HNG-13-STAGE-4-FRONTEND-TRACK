@@ -15,6 +15,7 @@ export default function HomeScreen() {
   useEffect(() => {
     if (user) {
       setUser({
+        id:user.id  || undefined,
         firstName: user.firstName || undefined,
         lastName: user.lastName || undefined,
         email: user.emailAddresses?.[0]?.emailAddress || undefined,

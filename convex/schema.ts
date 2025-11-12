@@ -14,14 +14,14 @@ export const User = {
 export const Message = {
   userId: v.id('users'), 
   threadId: v.optional(v.string()),
-  content: v.string(),
+  content: v.optional(v.string()),
   likeCount: v.number(), 
   commentCount: v.number(),
   mediaFiles: v.optional(v.array(v.string())), 
 };
 export default defineSchema({
   users: defineTable(User).index('byClerkId', ['clerkId']).searchIndex('searchUsers', {
-    searchField: 'email',
+    searchField: 'username',
   }),
   messages: defineTable(Message),
 });

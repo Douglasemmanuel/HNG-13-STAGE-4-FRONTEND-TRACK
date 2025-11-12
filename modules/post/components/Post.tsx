@@ -1,12 +1,11 @@
 
-import { StyleSheet, View, Pressable } from 'react-native';
+import { StyleSheet, View, Pressable, ScrollView, Image } from 'react-native';
 import React, { useState } from 'react';
 import ProfileImage from '@/modules/profile/components/ProfileImage';
 import { ThemedText } from '@/components/themed-text';
 import { useColorScheme } from 'react-native';
 import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import RoundedImage from './RoundedImage';
 import { truncateString } from '@/utils/StringUtils';
 
 interface PostProps {
@@ -14,7 +13,7 @@ interface PostProps {
   date: string;
   text?: string;
   profileImage: any;
-  postImage?: any;
+  postImage?: string[];
   initialLikes?: number;
   initialComments?: number;
 }
@@ -38,73 +37,106 @@ const Post: React.FC<PostProps> = ({
     setLiked(!liked);
     setLikes(liked ? likes - 1 : likes + 1);
   };
-  
 
   const handleComment = () => console.log('Comment pressed');
   const handleInsight = () => console.log('Insight pressed');
-const containerHeight = postImage && text
-  ? 190   
-  : postImage
-  ? 155   
-  : text
-  ? 35    
-  : 30; 
+
+  const hasImage = postImage && postImage.length > 0;
+  const hasText = !!text;
+
   return (
-   <View style={styles.container}>
-     <View style={styles.postContainer}>
-      <View style={{ alignItems: 'center' }}>
-        <ProfileImage source={profileImage} size={60} borderColor={theme.tint} borderWidth={3} />
-        <View
-          style={{
-            height: containerHeight,
-            width: 1,
-            backgroundColor: theme.tint,
-            marginTop: postImage ? 4 : 0,
-          }}
-        />
-      </View>
-
-      <View style={{ flex: 1, marginLeft: 10 }}>
-        
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent:'space-between' }}>
-          <ThemedText type="subtitle">{truncateString(username)}</ThemedText>
-          <ThemedText type="defaultSemiBold">{date}</ThemedText>
-          <Pressable>
-            <Ionicons name="ellipsis-horizontal" size={24} color={theme.icon} />
-          </Pressable>
+    <View style={styles.container}>
+      <View style={styles.postContainer}>
+        {/* Profile + connector line */}
+        <View style={{ alignItems: 'center' }}>
+          <ProfileImage
+            source={{uri:profileImage}}
+            size={60}
+            borderColor={theme.tint}
+            borderWidth={3}
+          />
+          {(hasText || hasImage) && (
+            <View
+              style={{
+                flex: 1,
+                width: 1,
+                backgroundColor: theme.tint,
+                marginTop: 6,
+              }}
+            />
+          )}
         </View>
-       {text && (
-         <View style={{ marginTop: 6 }}>
-          <ThemedText type="defaultSemiBold">{text}</ThemedText>
-        </View>
-       )}
 
-       
-        {postImage && (
-          <View style={{ marginTop: 6 }}>
-            <RoundedImage source={postImage} />
+        {/* Post Content */}
+        <View style={{ flex: 1, marginLeft: 10 }}>
+          {/* Username and date row */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <ThemedText type="subtitle">{truncateString(username)}</ThemedText>
+            <ThemedText type="defaultSemiBold">{date}</ThemedText>
+            <Pressable>
+              <Ionicons name="ellipsis-horizontal" size={24} color={theme.icon} />
+            </Pressable>
           </View>
-        )}
 
-       
-        <View style={[styles.actionsContainer, { marginTop:15}]}>
-          <Pressable style={styles.action} onPress={handleLike}>
-            <Ionicons name={liked ? 'heart' : 'heart-outline'} size={24} color={liked ? 'red' : theme.icon} />
-            <ThemedText type="defaultSemiBold">{likes}</ThemedText>
-          </Pressable>
+          {/* Text content */}
+          {hasText && (
+            <View style={{ marginTop: 6 }}>
+              <ThemedText type="defaultSemiBold">{text}</ThemedText>
+            </View>
+          )}
 
-          <Pressable style={styles.action} onPress={handleComment}>
-            <Ionicons name="chatbubble-outline" size={24} color={theme.icon} />
-            <ThemedText type="defaultSemiBold">{initialComments}</ThemedText>
-          </Pressable>
+          {/* Images */}
+          {hasImage && (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{ marginTop: hasText ? 6 : 0 }}
+            >
+              {postImage.map((imageUrl: string, index: number) => (
+                <Image
+                  key={index}
+                  source={{ uri: imageUrl }}
+                  style={{
+                    width: 150,
+                    height: 150,
+                    borderRadius: 10,
+                    marginRight: 10,
+                  }}
+                  resizeMode="cover"
+                />
+              ))}
+            </ScrollView>
+          )}
 
-          <Pressable style={styles.action} onPress={handleInsight}>
-            <Ionicons name="stats-chart-outline" size={24} color={theme.icon} />
-          </Pressable>
+          {/* Actions */}
+          <View style={[styles.actionsContainer, { marginTop: 15 }]}>
+            <Pressable style={styles.action} onPress={handleLike}>
+              <Ionicons
+                name={liked ? 'heart' : 'heart-outline'}
+                size={24}
+                color={liked ? 'red' : theme.icon}
+              />
+              <ThemedText type="defaultSemiBold">{likes}</ThemedText>
+            </Pressable>
+
+            <Pressable style={styles.action} onPress={handleComment}>
+              <Ionicons name="chatbubble-outline" size={24} color={theme.icon} />
+              <ThemedText type="defaultSemiBold">{initialComments}</ThemedText>
+            </Pressable>
+
+            <Pressable style={styles.action} onPress={handleInsight}>
+              <Ionicons name="stats-chart-outline" size={24} color={theme.icon} />
+            </Pressable>
+          </View>
         </View>
       </View>
     </View>
-   </View>
   );
 };
 
@@ -116,13 +148,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 10,
     paddingVertical: 10,
-    // borderBottomWidth: 0.4, 
   },
-  container:{
-   borderBottomColor: '#ccc', 
-    paddingTop:30,
-    paddingBottom:10,
-    borderBottomWidth: 0.4
+  container: {
+    borderBottomColor: '#ccc',
+    paddingTop: 30,
+    paddingBottom: 10,
+    borderBottomWidth: 0.4,
   },
   actionsContainer: {
     flexDirection: 'row',
